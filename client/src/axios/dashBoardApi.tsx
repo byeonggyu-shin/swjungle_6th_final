@@ -8,12 +8,23 @@ import {
 const api = "http://localhost:8800/api";
 const testapi = "http://localhost:4000";
 
-export const Main_graph_Api = async (): Promise<Main_graph_Api_DTO> => {
-  const response = await axios.get(`${api}/graph`, {
+export const Main_graph_Api = async (
+  userid?: string
+): Promise<Main_graph_Api_DTO> => {
+  console.log("api", userid);
+  let url = `${api}/graph`;
+  if (userid) {
+    url += `?userId=${userid}`;
+  }
+  console.log("url check 1", url);
+
+  const response = await axios.get(url, {
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
   });
   const graph = response.data as Main_graph_Api_DTO;
-  console.log(graph);
+
+  console.log("url check 2", url);
+
   return graph;
 };
 
