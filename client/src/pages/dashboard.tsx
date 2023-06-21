@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { useRecoilState } from "recoil";
 import { DashBoardCardAtom } from "@/recoil/atoms/MainGraphAtom";
 // Component
@@ -14,6 +14,7 @@ import useGraph from "@/features/MainGraph/hooks/useGraph";
 export default function Dashboard() {
   const [openCard, setOpenCard] = useRecoilState(DashBoardCardAtom);
   const [showImgModal, setShowImgModal] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const graphData = useGraph();
 
   return (
@@ -26,9 +27,11 @@ export default function Dashboard() {
               <UserPanel
                 showImgModal={showImgModal}
                 setShowImgModal={setShowImgModal}
+                editMode={editMode}
+                setEditMode={setEditMode}
               />
               <div className="flex flex-row justify-between w-full">
-                <MainGraph data={graphData} />
+                <MainGraph data={graphData} editMode={editMode} />
                 {openCard ? <CardPanel /> : <></>}
               </div>
             </div>

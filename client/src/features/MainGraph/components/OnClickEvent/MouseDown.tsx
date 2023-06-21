@@ -43,7 +43,7 @@ const handleNodeLongClick = (
           const token = getToken();
           const result = await POST(
             "tag/merge",
-            { tagId1: prevNode.id, tagId2: currentNode.id },
+            { tagId1: currentNode.id, tagId2: prevNode.id },
             token
           );
           console.log(result);

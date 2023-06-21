@@ -9,12 +9,12 @@ const combineNodes = ({
 }: CombineNodesParams) => {
   // 새 노드 생성
   const newNode: ChartNode = {
-    id: node1.id,
-    name: node1.name,
+    id: node2.id,
+    name: node2.name,
     x: node2.x,
     y: node2.y,
     symbolSize: node1.symbolSize + node2.symbolSize,
-    category: node1.category,
+    category: node2.category,
   };
 
   // 애니메이션 시작

@@ -12,9 +12,10 @@ import handleNodeUnclick from "@/features/MainGraph/components/OnClickEvent/Mous
 
 type MainGraphProps = {
   data: Main_graph_Api_DTO;
+  editMode: boolean;
 };
 
-function Graph({ data: graph }: MainGraphProps) {
+function Graph({ data: graph, editMode }: MainGraphProps) {
   const chartRef = useRef<HTMLDivElement>(null);
   const [lastClickedNode, setLastClickedNode] = useState<string>("");
   const [openCard, setOpenCard] = useRecoilState(DashBoardCardAtom);
@@ -73,18 +74,22 @@ function Graph({ data: graph }: MainGraphProps) {
 
   const handleNodeClick = useCallback(
     (nodeName: string) => {
-      // 이전에 클릭된 노드인지 확인
-      const isLastClickedNode = lastClickedNode === nodeName;
-      setLastClickedNode(nodeName);
-      // 클릭된 노드 상태 업데이트
-      if (isLastClickedNode) {
-        setOpenCard(!openCard);
-      } else {
-        setOpenCard(true);
-        setNodeName(nodeName);
+
+      if (!editMode) {
+        // 이전에 클릭된 노드인지 확인
+        const isLastClickedNode = lastClickedNode === nodeName;
+        setLastClickedNode(nodeName);
+        // 클릭된 노드 상태 업데이트
+        if (isLastClickedNode) {
+          setOpenCard(!openCard);
+        } else {
+          setOpenCard(true);
+          setNodeId(nodeName);
+        }
+
       }
     },
-    [lastClickedNode, openCard]
+    [editMode, lastClickedNode, openCard]
   );
 
   useEffect(() => {
@@ -101,9 +106,11 @@ function Graph({ data: graph }: MainGraphProps) {
 
       // 마우스 오래 클릭시 태그 병합
       const handleMouseDown = (params: any) => {
-        chart.getZr().off("mouseup", handleNodeUnclick(pressTimer));
-        handleNodeLongClick(params, chart, longPressNode, pressTimer);
-        chart.getZr().on("mouseup", handleNodeUnclick(pressTimer));
+        if (editMode) {
+          chart.getZr().off("mouseup", handleNodeUnclick(pressTimer));
+          handleNodeLongClick(params, chart, longPressNode, pressTimer);
+          chart.getZr().on("mouseup", handleNodeUnclick(pressTimer));
+        }
       };
 
       chart.getZr().on("mousedown", handleMouseDown);
@@ -122,7 +129,7 @@ function Graph({ data: graph }: MainGraphProps) {
         chart.getZr().off("mousedown", handleMouseDown);
       };
     }
-  }, [options, handleNodeClick]);
+  }, [editMode, handleNodeClick]);
 
   // Add a new useEffect for resizing
   useEffect(() => {
