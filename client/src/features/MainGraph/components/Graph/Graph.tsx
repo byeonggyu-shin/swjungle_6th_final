@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 // recoil
 import { useRecoilState } from "recoil";
-import { DashBoardCardAtom, NodeIdAtom } from "@/recoil/atoms/MainGraphAtom";
+import { DashBoardCardAtom, NodeNameAtom } from "@/recoil/atoms/MainGraphAtom";
 // library
 import * as echarts from "echarts";
 // type
@@ -18,23 +18,21 @@ function Graph({ data: graph }: MainGraphProps) {
   const chartRef = useRef<HTMLDivElement>(null);
   const [lastClickedNode, setLastClickedNode] = useState<string>("");
   const [openCard, setOpenCard] = useRecoilState(DashBoardCardAtom);
-  const [nodeId, setNodeId] = useRecoilState(NodeIdAtom);
+  const [nodeName, setNodeName] = useRecoilState(NodeNameAtom);
   const pressTimer = useRef<any>(null);
   const longPressNode = useRef<string | null>(null);
 
   //  카테고리 빈 객체 생성
   const setCategories = (cnt: number) => {
     const categories = [];
-
     for (let i = 0; i < cnt; i++) {
       const obj = {};
       categories.push(obj);
     }
-
     return categories;
   };
 
-  const [options, setOptions] = useState<echarts.EChartsOption>({
+  const [options, setOptions] = useState<any>({
     tooltip: {},
     animationDuration: 1500,
     animationEasingUpdate: "quinticInOut",
@@ -83,7 +81,7 @@ function Graph({ data: graph }: MainGraphProps) {
         setOpenCard(!openCard);
       } else {
         setOpenCard(true);
-        setNodeId(nodeName);
+        setNodeName(nodeName);
       }
     },
     [lastClickedNode, openCard]
@@ -111,7 +109,7 @@ function Graph({ data: graph }: MainGraphProps) {
       chart.getZr().on("mousedown", handleMouseDown);
       chart.getZr().on("mouseup", handleNodeUnclick(pressTimer));
 
-      const clickHandler = function (params) {
+      const clickHandler = function (params: any) {
         if (params.dataType === "node" && !pressTimer.current) {
           handleNodeClick(params.name as string);
         }
@@ -134,7 +132,7 @@ function Graph({ data: graph }: MainGraphProps) {
         chart.resize();
       }
     }
-  }, [nodeId, openCard]);
+  }, [nodeName, openCard]);
 
   return (
     <div

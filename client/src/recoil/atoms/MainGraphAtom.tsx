@@ -1,7 +1,6 @@
 import React from "react";
 import { atom } from "recoil";
 import { CardData_DTO, CardDetail_DTO } from "@/types/dashborad.types";
-import CardDetail from '../../features/Social/components/CardDetail';
 
 export const DashBoardCardAtom = atom({
   key: "DashBoardCardAtom",
@@ -18,8 +17,8 @@ export const ChartOptionAtom = atom({
   default: null,
 });
 
-export const NodeIdAtom = atom<string | null>({
-  key: "NodeIdAtom",
+export const NodeNameAtom = atom<string | null>({
+  key: "NodeNameAtom",
   default: null,
 });
 

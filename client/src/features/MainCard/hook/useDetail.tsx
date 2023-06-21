@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 // recoil
 import { useRecoilValue } from "recoil";
-import {
-  NodeIdAtom,
-  ClickedCardDetailAtom,
-} from "@/recoil/atoms/MainGraphAtom";
+import { ClickedCardDetailAtom } from "@/recoil/atoms/MainGraphAtom";
 // Api call
 import { Card_Detail_Api } from "@/axios/dashBoardApi";
 // types
@@ -22,6 +19,7 @@ function useDetail() {
     getCardData();
   }, [cardId]);
 
+  console.log("useDetail data: ", data);
   return data;
 }
 

@@ -1,13 +1,13 @@
 export interface UserInfo {
   id: number;
-  username: string;
-  tags: number;
-  cards: number;
-  friends: number;
+  userName: string;
+  tagCnt: number;
+  cardCnt: number;
+  followCnt: number;
 }
 
 interface GraphNode {
-  id: string;
+  id: number;
   name: string;
   symbolSize: number;
   category: number;
@@ -29,13 +29,15 @@ export interface CardData {
   cardTag: string[];
   cardContent: string;
 }
-
 export interface CardData_DTO {
-  data: CardData[];
+  cardData: CardData[];
 }
 
+interface CardDetail {
+  cardId?: number;
+  cardTag?: string[];
+  cardImage?: string;
+}
 export interface CardDetail_DTO {
-  cardId: number;
-  cardTag: string[];
-  cardImage: string;
+  data: CardDetail[];
 }

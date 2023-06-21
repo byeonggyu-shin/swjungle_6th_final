@@ -1,24 +1,35 @@
 import React from "react";
 //recoil
 import { useRecoilState } from "recoil";
-import { CardDetailOpenAtom, ClickedCardDetailAtom } from "@/recoil/atoms/MainGraphAtom";
+import {
+  CardDetailOpenAtom,
+  ClickedCardDetailAtom,
+} from "@/recoil/atoms/MainGraphAtom";
 // 타입 임포트
 import { CardData } from "@/types/dashborad.types";
 
-function Card(data: CardData) {
+function Card({ data }: { data: CardData }) {
   const [detailOpen, setDetailOpen] = useRecoilState(CardDetailOpenAtom);
-  const [clickedDetail, setClickedDetail] = useRecoilState(ClickedCardDetailAtom);
+  const [clickedDetail, setClickedDetail] = useRecoilState(
+    ClickedCardDetailAtom
+  );
 
   const handleCardClick = () => {
     setDetailOpen(!detailOpen);
-    setClickedDetail(data?.data.cardId)
+    setClickedDetail(data?.cardId);
   };
 
   return (
     <div className="w-1/2 bg-red-200 h-1/3" onClick={handleCardClick}>
-      <div> card </div>
-      <div> tag {data?.data.cardTag}</div>
-      <div> Content {data?.data.cardContent}</div>
+      {data !== undefined ? (
+        <div>
+          <div> card </div>
+          <div> tag {data?.cardTag}</div>
+          <div> Content {data?.cardContent}</div>
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

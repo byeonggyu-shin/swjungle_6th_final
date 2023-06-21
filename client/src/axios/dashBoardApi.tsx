@@ -13,6 +13,7 @@ export const Main_graph_Api = async (): Promise<Main_graph_Api_DTO> => {
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
   });
   const graph = response.data as Main_graph_Api_DTO;
+  console.log(graph);
   return graph;
 };
 
@@ -21,27 +22,29 @@ export const User_Info_Api = async () => {
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
   });
   const userData = response.data;
-  console.log(userData)
+  console.log("User_Info_Api 호출");
   return userData;
 };
 
 export const Card_Info_Api = async (
-  params: string | undefined
+  params: string | null
 ): Promise<CardData_DTO> => {
   const response = await axios.get(`${api}/cards/tag?tagname=${params}`, {
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
   });
   const card = response.data as Promise<CardData_DTO>;
+  console.log("Card_Info_Api 호출");
   return card;
 };
 
 export const Card_Detail_Api = async (
-  params: string | undefined
+  params: number | null
 ): Promise<CardDetail_DTO> => {
   const response = await axios.get(`${api}/cards/info?cardId=${params}`, {
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
   });
   const card = response.data as Promise<CardDetail_DTO>;
+  console.log("Card_Detail_Api 호출");
   return card;
 };
 
