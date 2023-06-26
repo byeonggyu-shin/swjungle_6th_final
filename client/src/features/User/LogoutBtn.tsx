@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { signOut } from "next-auth/react";
+// import { signOut } from "next-auth/react";
 
 function LogoutBtn() {
   const router = useRouter();
@@ -9,7 +9,9 @@ function LogoutBtn() {
     localStorage.removeItem('token');
 
     // Redirect to the main page(index.js)
-    signOut({ callbackUrl: "/" });
+    router.push("/");
+
+    // signOut({ callbackUrl: "/" });
   }
 
   return (
