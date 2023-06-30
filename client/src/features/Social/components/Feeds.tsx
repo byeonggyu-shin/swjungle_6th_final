@@ -22,8 +22,7 @@ const Feeds = () => {
   const router = useRouter();
 
   const getFeeds = async () => {
-    const token = getToken();
-    const data = await GET(`social/card`, token);
+    const data = await GET(`social/card`, true);
     if (data.status === 200) {
       setCards(data.data);
     }
@@ -41,7 +40,7 @@ const Feeds = () => {
   };
 
   const rejectCard = async (id: number) => {
-    const data = await GET(`graph?userId=${id}`, getToken());
+    const data = await GET(`graph?userId=${id}`, true);
     if (data.status === 200) {
       // const newCards = cards.filter((c) => c.id !== id);
       // setCards(newCards);

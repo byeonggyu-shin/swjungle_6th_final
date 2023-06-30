@@ -1,19 +1,14 @@
-import axios from "axios";
+import { DELETE } from "@/axios/DELETE";
 import { signOut } from "next-auth/react";
 
 type WithdrawalBtnProps = {
-  token: string | null;
   userInfo: any;
 };
 
-const WithdrawalBtn: React.FC<WithdrawalBtnProps> = ({ token, userInfo }) => {
+const WithdrawalBtn: React.FC<WithdrawalBtnProps> = ({ userInfo }) => {
   const handleWithdrawal = async () => {
     try {
-      const response = await axios.delete("/api/myinfo", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await DELETE("myinfo", true);
 
       if (response.data.success) {
         localStorage.removeItem("token");

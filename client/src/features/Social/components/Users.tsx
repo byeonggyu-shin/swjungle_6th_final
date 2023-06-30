@@ -26,8 +26,7 @@ const Users = () => {
   const router = useRouter();
   // 추천 친구 조회
   const getUsers = async () => {
-    const token = getToken();
-    const data = await GET("social/user", token);
+    const data = await GET("social/user", true);
     if (data.status === 200) {
       setUsers(data.data);
     }
@@ -39,15 +38,13 @@ const Users = () => {
 
   // 팔로잉 등록
   const handleAddFollow = async (userId: number) => {
-    const token = getToken();
-    await POST(`social/follow?followId=${userId}`, null, token);
+    await POST(`social/follow?followId=${userId}`, null, true);
     getUsers();
   };
 
   // 팔로잉 취소
   const handleDeleteFollow = async (userId: number) => {
-    const token = getToken();
-    await DELETE(`social/follow?followId=${userId}`, token);
+    await DELETE(`social/follow?followId=${userId}`, true);
     getUsers();
   };
 

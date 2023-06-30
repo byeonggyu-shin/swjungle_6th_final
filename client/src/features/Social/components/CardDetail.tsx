@@ -19,10 +19,9 @@ const CardDetail = ({
   const [showModal, setShowModal] = useRecoilState(SocialImgModalAtom);
 
   const getDetail = async () => {
-    const token = getToken();
     const data = await GET(
       `cards/info?cardId=${cardId}&userId=${userId}`,
-      token
+      true
     );
     if (data.status === 200) {
       setDetail(data.data);
@@ -30,8 +29,7 @@ const CardDetail = ({
   };
 
   const cloneCard = async () => {
-    const token = getToken();
-    const data: any = await POST(`social/clone`, { cardId: cardId }, token);
+    const data = await POST(`social/clone`, { cardId: cardId }, true);
     if (data.status === 200) {
       setIsPlus(true);
       setShowModal(false);

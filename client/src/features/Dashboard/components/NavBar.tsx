@@ -31,8 +31,7 @@ export default function NavBar() {
   const [alarmCnt, setAlarmCnt] = useRecoilState(AlarmCntAtom);
 
   const getProfileImg = async () => {
-    const token = getToken();
-    const data = await GET("user/profile", token);
+    const data = await GET("user/profile", true);
     if (data.status === 200) {
       setUserProfile(data.data.userProfile);
     }

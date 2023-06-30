@@ -1,8 +1,15 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
+import getToken from "./getToken";
 
-export const POST = async (uri: string, data: any, headers: any) => {
+export const POST = async (uri: string, data: any, headers: boolean) => {
   try {
-    const res = await axios.post(`/api/${uri}`, data, headers);
+    let res: AxiosResponse;
+    if (headers) {
+      const token = getToken();
+      res = await axios.post(`http://localhost:8800/api/${uri}`, data, token);
+    } else {
+      res = await axios.post(`http://localhost:8800/api/${uri}`, data);
+    }
     console.log(`${uri} - POST 성공`);
     return res;
   } catch (err) {

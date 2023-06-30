@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { LoginStateAtom } from "@/recoil/atoms/LoginStateAtom";
 
-import axios from "axios";
 import { useRouter } from "next/router";
 // Component
 import NavBar from "@/features/Dashboard/components/NavBar";
 import { Wrapper } from "@/styles/wrapper";
+import { POST } from "@/axios/POST";
 
 export default function Home() {
   const router = useRouter();
@@ -17,11 +17,15 @@ export default function Home() {
 
   const setLoginId = useSetRecoilState(LoginStateAtom);
 
-  const handleLogin = async (res: any) => {
-    const response = await axios.post(`/api/login/generic`, {
-      email: userEmail,
-      password: password,
-    });
+  const handleLogin = async () => {
+    const response = await POST(
+      "login/generic",
+      {
+        email: userEmail,
+        password: password,
+      },
+      false
+    );
 
     setUserEmail("");
     setPassword("");

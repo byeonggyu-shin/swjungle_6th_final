@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+
+import { POST } from "@/axios/POST";
+
 // recoil
 import { useSetRecoilState } from "recoil";
 import { LoginStateAtom } from "@/recoil/atoms/LoginStateAtom";
 
-import { useRouter } from "next/router";
-import axios from "axios";
-import NavBar from "@/features/Dashboard/components/NavBar";
-import { Wrapper } from "@/styles/wrapper";
 import SignupButton from "@/features/User/SignupButton";
 import LoginBtn from "@/features/User/LoginBtn";
 
@@ -32,8 +33,8 @@ export default function Home() {
           </p>
           <p className="mt-10 mb-32 font-bold text-8xl">insightLINK</p>
           <div className="flex justify-between h-11">
-            { !token ? <SignupButton /> : null}
-            { !token ? <LoginBtn /> : null}
+            {!token ? <SignupButton /> : null}
+            {!token ? <LoginBtn /> : null}
           </div>
         </div>
       </div>

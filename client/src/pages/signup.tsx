@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useRouter } from "next/router";
 import NavBar from "@/features/Dashboard/components/NavBar";
+import { POST } from "@/axios/POST";
 // Component
 
 export default function Home() {
@@ -53,11 +53,15 @@ export default function Home() {
       setPasswordMatchError(false);
     }
 
-    const response = await axios.post(`/api/signup`, {
-      email: userEmail,
-      name: userName,
-      password: password,
-    });
+    const response = await POST(
+      "signup",
+      {
+        email: userEmail,
+        name: userName,
+        password: password,
+      },
+      false
+    );
 
     if (response.data.success) {
       alert(`Success! User ${userName} was successfully created!`);

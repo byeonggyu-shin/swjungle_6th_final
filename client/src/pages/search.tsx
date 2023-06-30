@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+// Components
 import NavBar from "@/features/Dashboard/components/NavBar";
-import { Wrapper } from "@/styles/wrapper";
 import SearchBar from "@/features/Search/SearchBar";
 import Card from "@/features/Search/Card";
-import { CgSearch } from "react-icons/cg";
-import { AiOutlineExpand, AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+// Assets
+import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 
 export default function Search() {
   const router = useRouter();
@@ -21,7 +21,6 @@ export default function Search() {
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
-
 
   useEffect(() => {
     const fetchData = async () => {

@@ -1,13 +1,15 @@
 import axios, { AxiosResponse } from "axios";
+import getToken from "./getToken";
 
 export const DELETE = async (
   uri: string,
-  headers?: any
+  headers: boolean
 ): Promise<any | null> => {
   try {
     let res: AxiosResponse;
     if (headers) {
-      res = await axios.delete(`/api/${uri}`, headers);
+      const token = getToken();
+      res = await axios.delete(`/api/${uri}`, token);
     } else {
       res = await axios.delete(`/api/${uri}`);
     }

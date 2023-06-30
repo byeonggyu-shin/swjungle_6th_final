@@ -23,8 +23,7 @@ const Friends = () => {
 
   // 최근 업데이트 친구 조회
   const getFriends = async () => {
-    const token = getToken();
-    const data = await GET("social/updated", token);
+    const data = await GET("social/updated", true);
     if (data.status === 200) {
       setFriends(data.data);
     }
