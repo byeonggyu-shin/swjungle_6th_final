@@ -65,11 +65,11 @@ const extractTagFromImage = async (imgUrl, req, res) => {
     console.log('fr: extractTagFromImage: ', tagJSON);
 
     if (!tagJSON || !tagJSON.tags) {
-      logger.error('Invalid JSON data. No "tags" property found.');
+      logger.error('Invalid JSON data in upload.js No "tags" property found.');
       return null;
     }
     if (tagJSON.tags == null || tagJSON.tags.some(tag => tag == null)) {
-      logger.info('/routes/uploads 폴더, post, Some tags are null.');
+      logger.info('/routes/uploads, post, Some tags are null in upload.js');
       return null;
     }
     /* 프론트 */
