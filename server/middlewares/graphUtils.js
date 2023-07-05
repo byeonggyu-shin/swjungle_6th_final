@@ -151,6 +151,5 @@ const sortDirection = (graphDirectionResult) => {
   const uniqueList = output.filter((obj, index, self) => {
     return index === self.findIndex((o) => compareObjects(o, obj));
   });
-
   return uniqueList;
 };

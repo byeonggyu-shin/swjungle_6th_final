@@ -9,9 +9,6 @@ import { disconnQuery, existQuery, findToConnQuery, findTobeConnQuery, tagInsert
 
 const router = express.Router();
 
-
-
-
 router.get('/', async (req, res) => {
 
   let userId = undefined;

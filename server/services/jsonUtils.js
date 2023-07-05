@@ -9,12 +9,12 @@ export const extractJson = (str) => {
       const array = JSON.parse(`[${extracted}]`);
       
       const limitedArray = array.slice(0, 2);
-      console.log('fr: 2개 제한 array: ', limitedArray);
+      console.log(limitedArray);
 
       return { tags: limitedArray };
     } else {
       logger.info('/services/jsonUtils 폴더, tags are not in format of [ ].');
-      return null;
+      return { tags: '<Image>' };
     }
   }
 };

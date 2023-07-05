@@ -161,15 +161,26 @@ const generateUserContent = async (ocrResult, userId) => {
     connection = await db.getConnection();
     const [rows] = await connection.query(`SELECT koreanKeyword FROM taglist WHERE user_id = ${userId}`);
     connection.release();
-    const taglist = rows.map(row => row.englishKeyword);   // taglist 테이블의 englishKeywords를 리스트로.
+    console.log(rows);
+    const taglist = rows.map(row => row.koreanKeyword);   // taglist 테이블의 englishKeywords를 리스트로.
     const taglistText = taglist.map(tag => JSON.stringify(tag)).join(',');
+    console.log(taglistText);
 
     let behavior = '제공된 데이터를 기반으로 관련된 카테고리나 주제를 제안해주세요.\n';
     let data = '데이터:';
     data += ocrResult +'\n';
-    let note = '유저의 일반적인 관심사를 고려하며, ' 
-    note += `${taglistText}와 같은 카테골가 있음을 감안하여, `;
-    note += '제공된 데이터의 범위를 넘어서도 새롭고 흥미로운 아이디어를 추천할 수 있습니다. 또한, 유저의 일반적인 관심사에 겹치는 부분이 있다면 해당 카테고리를 우선적으로 추천해도 됩니다.';
+    
+    let note = '';
+    if (taglistText.length != 0) {
+      note += '유저의 일반적인 관심사를 고려하며, ';
+      note += `${taglistText}와 같은 카테고리가 있음을 감안하여, `;
+    }
+    
+    note += '제공된 데이터의 범위를 넘어서도 새롭고 흥미로운 아이디어 혹은 카테고리를 추천할 수 있습니다.';
+    
+    if (taglistText.length != 0) {
+      note += '또한, 유저의 일반적인 관심사에 겹치는 부분이 있다면 해당 카테고리를 우선적으로 추천해도 됩니다.';
+    }
 
     const userContent = behavior + data + note;
     console.log('userContent: ', userContent);

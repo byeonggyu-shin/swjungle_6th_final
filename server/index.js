@@ -8,7 +8,9 @@ import { logger } from './winston/logger.js';
 import { db } from './connect.js';
 
 /* Router */
+// import uploadRouter from './routes/uploads_copy.js';
 import uploadRouter from './routes/uploads.js';
+// import uploadRouter from './routes/uploads_backup.js';
 import loginRouter from './routes/login.js';
 import signupRouter from './routes/signup.js';
 import graphRouter from './routes/graphs.js';
