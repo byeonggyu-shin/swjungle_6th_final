@@ -34,7 +34,9 @@ export const getTagListIndicesByUser =
         GROUP BY koreanKeyword, tag_index
         ORDER BY tag_index`;
 
+
+// TODO: GROUP BY가 최선인가
 export const getNextTagIndex = 
-    `SELECT MAX(tag_index) + 1 AS next_index 
-        FROM taglist 
-        WHERE user_id = ?`;
+    `SELECT IF(tag_index IS NULL, 0, MAX(tag_index) + 1) AS next_index 
+        FROM taglist
+        GROUP BY tag_index`;
