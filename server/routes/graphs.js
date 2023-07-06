@@ -1,124 +1,168 @@
-import express from 'express';
-import '../dotenv.js';
-import { db } from '../connect.js';
-
+import express from 'express'
+import '../dotenv.js'
+import { db } from '../connect.js'
+import { graphCountQuery, graphDirectionQuery } from '../db/graphQueries.js'
 /* log */
-import { logger } from '../winston/logger.js';
-import { getGraphData } from '../middlewares/graphUtils.js';
-import { disconnQuery, existQuery, findToConnQuery, findTobeConnQuery, tagInsertQuery } from '../db/connectQueries.js';
+import { logger } from '../winston/logger.js'
 
-const router = express.Router();
+function cycleCount(connections, nodes) {
+  let count = -1
+  const visited = new Set()
+  const groups = new Map()
 
-
-
-
-router.get('/', async (req, res) => {
-
-  let userId = undefined;
-  if(Object.keys(res.locals).length !==0) { // /api/graph 이면서 token 값 있는 경우 사용자 정보
-    /* 로그인 유저*/
-    const {user} = res.locals;
-    userId = user.user_id;
+  for (const node of nodes) {
+    if (!visited.has(node)) {
+      const groupNum = count + 1
+      DFS(connections, node, visited, groupNum, groups)
+      count++
+    }
   }
 
-  /* 다른 유저 */
-  const otherUserId = req.query.userId;
+  // 묶음 번호 리스트 생성
+  const groupList = nodes.map((node) => groups.get(node))
+  return groupList
+}
 
-  logger.info(`/routes/graphs 폴더, get, otherUserId : ${otherUserId}`);
+function DFS(connections, node, visited, groupNum, groups) {
+  visited.add(node)
+  groups.set(node, groupNum)
+
+  const neighbors = connections.find((item) => item.node === node).neighbors
+  if (neighbors.length > 0) {
+    for (const neighbor of neighbors) {
+      if (!visited.has(neighbor)) {
+        DFS(connections, neighbor, visited, groupNum, groups)
+      }
+    }
+  }
+}
+
+const router = express.Router()
+
+router.get('/', async (req, res) => {
+  /* 로그인 유저*/
+  const { user } = res.locals
+  const userId = user.user_id
+  /* 다른 유저 */
+  const otherUserId = req.query.userId
+
+  logger.info(`/routes/graphs 폴더, get, otherUserId : ${otherUserId}`)
 
   try {
     /* 다른 유저 그래프 조회 */
     if (otherUserId) {
-      const graphData = await getGraphData(otherUserId);
+      const graphData = await getGraphData(otherUserId)
       logger.info(
-        `/routes/graphs 폴더, get, 다른 유저 ${otherUserId} 그래프 조회 !`,
-      );
-      return res.send(graphData);
-    } 
-    
+        `/routes/graphs 폴더, get, 다른 유저 ${otherUserId} 그래프 조회 !`
+      )
+      return res.send(graphData)
+    }
     /* 기본 내 그래프 조회 */
-    const graphData = await getGraphData(userId);
-    logger.info(`/routes/graphs 폴더, get, 내 ${userId} 그래프 조회 !`);
-    res.send(graphData);
+    const graphData = await getGraphData(userId)
+    logger.info(`/routes/graphs 폴더, get, 내 ${userId} 그래프 조회 !`)
+    res.send(graphData)
   } catch (err) {
-    logger.error('/routes/graphs 폴더, get, err : ', err);
-    res.status(500).send('Internal Server Error'); // Send error response
+    logger.error('/routes/graphs 폴더, get, err : ', err)
+    res.status(500).send('Internal Server Error') // Send error response
   }
-});
+})
 
-
-/*************************** 태그 간선 연결/제거  ************************/
-
-/* /disconnect?tag1=A&tag2=B : tag A, B의 간선을 제거  */
-router.delete('/disconnect', async (req, res) => {
-  const { user } = res.locals;
-  const userId = user.user_id;
-
-  const tag1 = req.query.tag1;
-  const tag2 = req.query.tag2;
-
-  let connection = null;
+const getGraphData = async (userId) => {
+  let connection = null
   try {
-    connection = await db.getConnection();
-    /* tag1을 가진 파일 전부 찾기 */
-    const [fileList] = await connection.query(findToConnQuery, [tag1, userId, userId]);
-    console.log(fileList);
+    connection = await db.getConnection()
+    logger.info(
+      `/routes/graphs 폴더, get, userId : ${userId} has been logged in!`
+    )
 
-    /* 그 파일들에 대해 전부 tag2를 제거(Tag 테이블) */
-    for (const file of fileList) {
-      const [tagResult] = await connection.query(existQuery, [tag2, file.file_id]);
-      console.log('tagResult: ', tagResult[0].count);
-      if (tagResult[0].count > 0) {
-        await connection.query(disconnQuery, [file.file_id, tag2]); 
+    const [graphCountResult] = await connection.query(graphCountQuery(userId))
+
+    let maxSymbolSize = 0
+    for (let i = 0; i < graphCountResult.length; i++) {
+      const symbolSize = graphCountResult[i].symbolSize
+      maxSymbolSize = symbolSize > maxSymbolSize ? symbolSize : maxSymbolSize
+    }
+    for (let i = 0; i < graphCountResult.length; i++) {
+      const symbolSize = graphCountResult[i].symbolSize
+      const newSymbolSize = (symbolSize / maxSymbolSize) * 70
+      graphCountResult[i].symbolSize = newSymbolSize
+    }
+
+    const [graphDirectionResult] = await connection.query(
+      graphDirectionQuery(userId)
+    )
+
+    let graph = {
+      nodes: graphCountResult,
+      links: sortDirection(graphDirectionResult),
+    }
+    //source와 target 중복 값 제거
+    graph.links = graph.links.filter((link) => link.source !== link.target)
+
+    // graph.category
+    const idList = graph.nodes.map((node) => node.id)
+    const graphLinks = graph.links.map((link) => [link.source, link.target])
+    const connections = idList.map((node) => ({ node, neighbors: [] }))
+    for (const edge of graphLinks) {
+      const [a, b] = edge
+      const nodeA = connections.find((item) => item.node === a)
+      const nodeB = connections.find((item) => item.node === b)
+      nodeA.neighbors.push(b)
+      nodeB.neighbors.push(a)
+    }
+    const categoryList = cycleCount(connections, idList)
+    graph.nodes.forEach((node, index) => {
+      node.category = categoryList[index]
+    })
+
+    // graph.cnt
+    let maxCategory = -Infinity
+    for (const node of graph.nodes) {
+      if (node.category > maxCategory) {
+        maxCategory = node.category
       }
     }
-    connection.release();
-    console.log(`태그 [${tag1}]와 [${tag2}] 연결 끊기 성공!`);
-    res.status(200).send(`태그 [${tag1}]와 [${tag2}] 연결 끊기 성공!`);
+    graph.cnt = maxCategory
+
+    return graph
   } catch (err) {
-    connection?.release();
-    logger.error('/routes/graphs/ 폴더 router_delete 함수, post, err : ', err);
-    res.status(500).send('Internal Server Error');
+    connection?.release()
+    logger.error('/routes/graphs 폴더, get, err : ', err)
+    throw new Error('Internal Server Error')
   }
-});
+}
 
-
-
-/* /connect?tag1=A&tag2=B : tag A, B의 간선을 연결  */
-router.post('/connect', async (req, res) => {
-  const { user } = res.locals;
-  const userId = user.user_id;
-
-  const tag1 = req.query.tag1;
-  const tag2 = req.query.tag2;
-
-  let connection = null;
-  try {
-    connection = await db.getConnection();
-    // tag1을 가진 파일을 찾는다. 
-    const [fileList] = await connection.query(findToConnQuery, [tag1, userId]);
-    // console.log(fileList); 
-
-    // tag2 태그 인덱스
-    const [tagIndex] = await connection.query(findTobeConnQuery, [tag2, userId]);
-    // console.log(tagIndex, tagIndex[0].tag_index);
-
-    // 그 파일에 대한 Tag.tag에 'tag2' 추가: tag, tag_index where user_id = ?
-    // 종종 tag2에 대한 tag_index가 여러개인 경우 있지만, 유니크한 것이 정상이므로 첫번째 tag_index로 실행.
-    for (const file of fileList) {
-      await connection.query(tagInsertQuery, [file.file_id, tag2, tagIndex[0].tag_index]);
+const sortDirection = (graphDirectionResult) => {
+  const fileAndNode = graphDirectionResult
+  const output = []
+  const groupedNodes = fileAndNode.reduce((acc, { file, node }) => {
+    if (!acc[file]) {
+      acc[file] = [node]
+    } else {
+      acc[file].push(node)
     }
-    
-    connection.release();
-    console.log(`태그 [${tag1}]와 [${tag2}] 연결 성공!`);
-    res.status(200).send(`태그 [${tag1}]와 [${tag2}] 연결 성공!`);
-  } catch (err) {
-    connection?.release();
-    logger.error('/routes/graphs/ 폴더 router_put 함수, post, err : ', err);
-    res.status(500).send('Internal Server Error');
+    return acc
+  }, {})
+
+  for (const file in groupedNodes) {
+    const nodes = groupedNodes[file]
+    if (nodes.length > 1) {
+      output.push({ source: nodes[0].toString(), target: nodes[1].toString() })
+    }
   }
-});
 
+  const compareObjects = (obj1, obj2) => {
+    return (
+      (obj1.source === obj2.target && obj1.target === obj2.source) ||
+      (obj1.source === obj2.source && obj1.target === obj2.target)
+    )
+  }
 
+  const uniqueList = output.filter((obj, index, self) => {
+    return index === self.findIndex((o) => compareObjects(o, obj))
+  })
 
-export default router;
+  return uniqueList
+}
+
+export default router

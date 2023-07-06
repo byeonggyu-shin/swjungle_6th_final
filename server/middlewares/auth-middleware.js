@@ -2,21 +2,21 @@ import jwt from'jsonwebtoken';
 import '../dotenv.js';
 import { db } from '../connect.js';
 
-import { logger } from '../winston/logger.js';
-
 export const authMiddleware = async (req, res, next) => {
+  console.log('req.headers.authorization: ', req.headers.authorization);  //@
   const { authorization } = req.headers;
   const [authType, authToken] = (authorization || '').split(' ');
 
   if (!authToken || authType !== 'Bearer') {
     res.status(401).send({
-      errorMessage: 'This function is available after log in.',
+      errorMessage: 'This function is available after logging in.',
     });
     return;
   }
 
   try {
     const { userId } = jwt.verify(authToken, 'customized-secret-key');
+    console.log(userId);
 
     const connection = await db.getConnection();
     const sql = `SELECT * FROM User
@@ -33,10 +33,9 @@ export const authMiddleware = async (req, res, next) => {
 
     const user = result[0];
     res.locals.user = user; // 서버측 구성
-    logger.info(`auth-middleware 통과, userid : ${userId}`)
+    // console.log(user);
     next();
   } catch (err) {
-    logger.error(`auth-middleware, err : `, err);
     res.status(401).send({
       errorMessage: '로그인 후 이용 가능한 기능입니다.',
     });

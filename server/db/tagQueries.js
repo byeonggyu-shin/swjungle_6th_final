@@ -12,21 +12,3 @@ export const cardTagsQuery =
   FROM Tag
   JOIN File ON Tag.file_id = File.file_id
   WHERE File.user_id = ? AND File.file_id = ?`;
-
-export const tagCardsToPageQuery = 
-  `SELECT File.file_id, File.content, File.img_url
-    FROM File
-      JOIN Tag ON File.file_id = Tag.file_id
-    WHERE File.user_id = ? 
-    AND Tag.tag = ?
-    LIMIT ?, ?`;
-
-export const countTagCards = 
-  `SELECT count(*) AS total
-  FROM (
-    SELECT File.file_id, File.content, File.img_url
-      FROM File
-        JOIN Tag ON File.file_id = Tag.file_id
-      WHERE File.user_id = ? 
-      AND Tag.tag = ?
-  ) AS SubQuery`;
