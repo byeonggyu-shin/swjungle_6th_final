@@ -2,8 +2,6 @@ import express from 'express';
 import '../dotenv.js';
 import { db } from '../connect.js';
 
-import bcrypt from 'bcrypt';
-
 /* log */
 import { logger } from '../winston/logger.js';
 
@@ -13,7 +11,7 @@ const router = express.Router();
 router.post('/', async (req, res) => {
     const { email, name, password} = req.body;
 
-    const pwHash = await bcrypt.hash(password, 12);
+    console.log(req.body);
 
     let connection = null;
 
@@ -32,7 +30,7 @@ router.post('/', async (req, res) => {
 
       const insertSql = `INSERT INTO User(email, user_name, profile_img, password) 
           VALUES (?, ?, ?, ?)`;
-      await connection.query(insertSql, [email, name, imageUrl, pwHash]);
+      await connection.query(insertSql, [email, name, imageUrl, password]);
       connection.release();
 
       logger.info(`/routes/signup 폴더, post, ${email} 회원가입 성공 !`);

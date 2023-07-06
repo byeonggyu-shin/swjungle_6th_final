@@ -11,8 +11,7 @@ export const graphCountQuery = (userId) => {
 
 export const graphDirectionQuery = (userId) => {
   return `SELECT 
-            b.file_id as file, b.tag_index as node 
-          FROM Tag as b
+            b.file_id as file, b.tag_index as node FROM Tag as b
           WHERE 
             b.file_id in (SELECT a.file_id FROM File as a 
           WHERE a.user_id = ${userId});

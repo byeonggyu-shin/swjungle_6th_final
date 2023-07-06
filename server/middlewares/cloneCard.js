@@ -4,15 +4,13 @@ import { selectCardToClone } from '../db/cardQueries.js'
 import { copyQuery1 } from '../db/cardQueries.js'
 import { copyQuery2 } from '../db/cardQueries.js'
 import { cardCloneQuery } from '../db/cardQueries.js'
-import { InsertAlarmQuery } from '../db/alarmQueries.js';
+
 import { logger } from '../winston/logger.js'
 
 export const cloneCard = async (req, res) => {
   /* 가져오려는 카드 */
   const cardId = req.body.cardId
   console.log('cardId :', cardId)
-  /* 가져오려는 카드의 주인 아이디*/
-  const following_id = req.body.userId
   /* 로그인 유저 */
   const { user } = res.locals
   const userId = user.user_id
@@ -20,11 +18,6 @@ export const cloneCard = async (req, res) => {
   try {
     await cloneCards(userId, cardId) // userId ='me'
     logger.info('/routes/social/cloneCard 폴더 cloneCard함수, post 성공 !')
-    let connection = null;
-    connection = await db.getConnection();
-    const alarm_message = "CardDuplicate";
-    await connection.query(InsertAlarmQuery(userId,following_id,alarm_message));
-    connection.release();
     res.status(200).send('SUCCESS')
   } catch (err) {
     logger.error(

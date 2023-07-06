@@ -7,6 +7,7 @@ export const db = mysql.createPool({
   user: penv.MYSQL_USERNAME,
   password: penv.MYSQL_PASSWORD,
   database: penv.MYSQL_DB,
+  port: 3306,
   connectTimeout: 5000,
   connectionLimit: 30, //default 10
 });
