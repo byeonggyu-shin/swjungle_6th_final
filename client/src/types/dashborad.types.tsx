@@ -25,7 +25,7 @@ export interface Main_graph_Api_DTO {
   cnt: number;
 }
 
-export interface CardData {
+export interface FeedCardData {
   cardId: number;
   cardTag: string[];
   cardContent: string;
@@ -36,6 +36,13 @@ export interface CardData {
   tag: string;
   content: string;
   isFriend: boolean;
+}
+
+export interface CardData {
+  data: [FeedCardData];
+  totalResults: number;
+  totalPages: number;
+  hasNextPage: boolean;
 }
 
 export interface CardDataDetail {

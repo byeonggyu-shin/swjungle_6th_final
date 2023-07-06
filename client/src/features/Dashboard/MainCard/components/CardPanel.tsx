@@ -1,50 +1,40 @@
-import React, { useEffect, useState } from "react";
-// recoil
-import { useRecoilValue } from "recoil";
-import { CardDetailOpenAtom, NodeNameAtom } from "@/recoil/atoms/MainGraphAtom";
-// components
-import Card from "@/features/Dashboard/MainCard/components/Card";
-import CardDetail from "@/features/Dashboard/MainCard/components/CardDetail";
-// custom hook
-import useCard from "@/features/Dashboard/MainCard/hook/useCard";
-// types
-import { CardData } from "@/types/dashborad.types";
+import React from "react";
+import Image from "next/image";
+// Recoil
+import { useRecoilState, useSetRecoilState } from "recoil";
+import {
+  CardDetailOpenAtom,
+  ClickedCardDetailAtom,
+} from "@/recoil/atoms/MainGraphAtom";
+// Types
+import { FeedCardData } from "@/types/dashborad.types";
+// Assets
+import { BiFullscreen } from "react-icons/bi";
 
-function CardPanel() {
-  const [cardData, setCardData] = useState<CardData[]>([]);
-  const detailOpen = useRecoilValue(CardDetailOpenAtom);
-  const nodeName = useRecoilValue(NodeNameAtom);
-  const getData = useCard();
-
-  useEffect(() => {
-    if (getData) {
-      setCardData(getData);
-    }
-  }, [getData]);
-
-  return (
-    <div>
-      {detailOpen ? (
-        <div className="w-[32rem] h-[33rem]">
-          <CardDetail />
-        </div>
-      ) : (
-        <>
-          <div className="flex flex-row justify-between mb-4">
-            <div className="px-4 font-semibold leading-6 text-white bg-blue-600 rounded">
-              # {nodeName}
-            </div>
-            <div></div>
-          </div>
-          <div className="grid grid-cols-3 grid-flow-row w-[32rem] gap-y-3">
-            {cardData?.map((data: CardData, index: number) => {
-              return <Card data={data} key={index} />;
-            })}
-          </div>
-        </>
-      )}
-    </div>
-  );
+interface CardProps {
+  data: FeedCardData;
 }
 
-export default CardPanel;
+const Card: React.FC<CardProps> = ({ data }) => {
+  const [detailOpen, setDetailOpen] = useRecoilState(CardDetailOpenAtom);
+  const setClickedDetail = useSetRecoilState(ClickedCardDetailAtom);
+
+  const handleCardClick = () => {
+    setDetailOpen(!detailOpen);
+    setClickedDetail(data?.cardId);
+  };
+
+  return (
+    <div className="w-[10rem] bg-gray-100 h-[10rem] border-2 rounded border-gray-300 relative hover:border-blue-500 flex justify-center items-center">
+      <Image src={data?.cardImg} alt="" objectFit="cover" layout="fill" />
+      <button
+        className="absolute cursor-pointer svg-button-nomal right-3 bottom-3"
+        onClick={handleCardClick}
+      >
+        <BiFullscreen className="self-center z-1" size="1rem" />
+      </button>
+    </div>
+  );
+};
+
+export default Card;
