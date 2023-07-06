@@ -1,8 +1,12 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
-  darkMode: "media",
+  darkMode: "class",
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}", "./src/styles/dashboard.css"],
   theme: {
+    fontFamily: {
+      sans: ["var(--font-inter)"],
+    },
     extend: {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

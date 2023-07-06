@@ -34,6 +34,22 @@ export const Main_graph_Api = async (
   }
 };
 
+export const Share_graph_Api = async (
+  userid?: string
+): Promise<Main_graph_Api_DTO> => {
+  let url = `/api/share${userid ? `?userId=${userid}` : ""}`;
+
+  try {
+    const response = await axios.get(url);
+
+    console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 export const User_Info_Api = async (userid?: string): Promise<UserInfo_DTO> => {
   let url = `/api/${userid ? `other/${userid}` : `user`}`;
 
@@ -48,14 +64,19 @@ export const User_Info_Api = async (userid?: string): Promise<UserInfo_DTO> => {
 
 export const Card_Info_Api = async (
   tagname?: string | null,
-  userid?: string | undefined
-): Promise<CardData[]> => {
+  userid?: string | undefined,
+  page?: number | undefined,
+  perPage?: number | undefined
+): Promise<CardData> => {
   let url = `/api/cards/tag${tagname ? `?tagname=${tagname}` : ""}${
     userid ? `&userId=${userid}` : ""
-  }`;
-
+  }${page ? `&page=${page}` : "&page=1"}${
+    perPage ? `&perPage=${perPage}` : "&perPage=9"
+  }
+  `;
   try {
     const response = await axiosInstance.get(url);
+
     return response.data;
   } catch (err) {
     console.error(err);
@@ -130,8 +151,8 @@ export const Cancel_Follow_API = async (followId?: string | undefined) => {
 };
 
 export const Duplicate_Card_API = async (
-  cardId?: string | undefined,
-  tagId?: string | undefined
+  cardId?: number | null,
+  tagId?: string | null
 ) => {
   let url = `/api/cards/copy${cardId ? `?cardId=${cardId}` : ""}${
     tagId ? `&tagId=${tagId}` : ""

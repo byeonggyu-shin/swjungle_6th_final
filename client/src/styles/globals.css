@@ -2,8 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 @import "./dashboard.css";
-@import url("https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;400;500;600&display=swap");
 
-* {
-  font-family: "Kanit";
+
+/* Styles the scrollbar track */
+::-webkit-scrollbar {
+    width: 0.5rem;
+    background-color: #FFF;
+}
+
+/* Styles the scrollbar thumb (the draggable portion) */
+::-webkit-scrollbar-thumb {
+    background-color: #DADADA;
+    height: 19.9375rem;
 }

@@ -9,12 +9,16 @@ const LoginBtn: React.FC = () => {
   };
 
   return (
-    <button
-      onClick={handleClick}
-      className="font-bold py-2 rounded mr-4 border-black border w-full"
-    >
-      로그인
-    </button>
+    <div className="flex flex-col justify-center items-center gap-6">
+      <div
+        onClick={handleClick}
+        className="flex h-[3.375rem] px-7 justify-center items-center gap-2 rounded bg-gray-900 cursor-pointer"
+      >
+        <p className="text-white text-1.5xl font-ibm-plex-sans font-normal font-semibold leading-normal tracking-wide cursor-pointer">
+          로그인하기
+        </p>
+      </div>
+    </div>
   );
 };
 

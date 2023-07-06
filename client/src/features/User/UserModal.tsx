@@ -1,50 +1,43 @@
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import getToken from "@/axios/getToken";
+import { GET } from "@/axios/GET";
+import { PATCH } from "@/axios/PATCH";
+// Components
 import LogoutBtn from "./LogoutBtn";
-import axios from "axios";
-import { useRouter } from "next/router";
-import { AiFillEdit, AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
-
 import SwitchToggle from "./SwithToggle";
 import WithdrawalBtn from "./WithdrawalBtn";
+// Assets
+import { AiFillEdit, AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 
 type UserModalProps = {
   closeModal: () => void;
 };
 
 const UserModal: React.FC<UserModalProps> = ({ closeModal }) => {
-  const router = useRouter();
-
-  const [token, setToken] = useState<string | null>(null);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [editedNickname, setEditedNickname] = useState<string>("");
   const [isEditingNickname, setIsEditingNickname] = useState(false);
+  const token = getToken();
+
+  const fetchUserInfo = async () => {
+    try {
+      const response = await GET("myinfo", true);
+      if (response.data.success) {
+        setUserInfo(response.data.userInfo);
+      }
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    setToken(storedToken);
+    fetchUserInfo();
   }, []);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await axios.get("/api/myinfo", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.data.success) {
-          setUserInfo(response.data.userInfo);
-        }
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-
-    if (token) {
-      fetchUserInfo();
-    }
-  }, [token, isEditingNickname]);
+    fetchUserInfo();
+  }, [isEditingNickname]);
 
   const handleNicknameEdit = (name: string) => {
     setIsEditingNickname(true);
@@ -57,23 +50,17 @@ const UserModal: React.FC<UserModalProps> = ({ closeModal }) => {
 
   const handleNicknameSave = async () => {
     try {
-      const response = await axios.patch(
-        "/api/myinfo",
+      const response: any = await PATCH(
+        "myinfo",
         {
           editedNickname: editedNickname,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        true
       );
 
       if (response.data.success) {
         setIsEditingNickname(false);
-        console.log(isEditingNickname);
       }
-      console.log("Save edited nickname:", editedNickname);
     } catch (error) {
       console.error("Error saving the edited nickname:", error);
     }
@@ -88,7 +75,7 @@ const UserModal: React.FC<UserModalProps> = ({ closeModal }) => {
           </h2>
           <AiOutlineClose
             onClick={closeModal}
-            className="text-base leading-normal text-gray-400 font-xeicon"
+            className="text-base leading-normal text-gray-400 cursor-pointer font-xeicon"
           />
         </div>
         <div className="flex py-[2rem] items-start self-stretch border-b-2 border-gray-900">
@@ -96,54 +83,52 @@ const UserModal: React.FC<UserModalProps> = ({ closeModal }) => {
             My Profile
           </p>
           <div className="flex items-center gap-3">
-            {token && (
-              <>
-                <img
-                  src={userInfo?.image as string}
-                  alt="Profile"
-                  className="rounded-full w-[4rem] h-[4rem]"
+            <Image
+              src={userInfo?.image as string}
+              alt="Profile"
+              width={64} // rem to pixel conversion (1rem = 16px)
+              height={64} // rem to pixel conversion (1rem = 16px)
+              className="rounded-full"
+            />
+            {isEditingNickname ? (
+              <div className="flex w-[12.5rem] h-11 px-1 justify-between items-center border-b border-blue-500 bg-gray-200">
+                <input
+                  type="text"
+                  value={editedNickname}
+                  onChange={handleNicknameChange}
+                  className="flex items-center flex-1 gap-2 text-lg font-light leading-6 text-gray-900 bg-gray-200 font-kanit"
                 />
-                {isEditingNickname ? (
-                  <div className="flex w-[12.5rem] h-11 px-1 justify-between items-center border-b border-blue-500 bg-gray-200">
-                    <input
-                      type="text"
-                      value={editedNickname}
-                      onChange={handleNicknameChange}
-                      className="flex items-center flex-1 gap-2 text-lg font-light leading-6 text-gray-900 bg-gray-200 font-kanit"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex w-[12.5rem] h-11 px-1 justify-between items-center">
-                    <p className="text-lg font-light leading-6 text-gray-900 font-kanit">
-                      {userInfo?.name}
-                    </p>
-                  </div>
-                )}
-                {isEditingNickname ? (
-                  <button
-                    onClick={handleNicknameSave}
-                    className="flex items-center gap-[0.375rem]"
-                  >
-                    <AiOutlineCheck className="flex items-center gap-[0.375rem] text-colorBlue" />
-                    <p className="text-xl leading-normal tracking-tight text-colorBlue font-kanit">
-                      Done
-                    </p>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleNicknameEdit(userInfo?.name)}
-                    className="flex items-center gap-[0.375rem]"
-                  >
-                    <AiFillEdit
-                      className="flex items-center gap-[0.375rem] text-colorBlue"
-                      onClick={() => handleNicknameEdit(userInfo?.name)}
-                    />
-                    <p className="text-xl leading-normal tracking-tight text-colorBlue font-kanit">
-                      Edit
-                    </p>
-                  </button>
-                )}
-              </>
+              </div>
+            ) : (
+              <div className="flex w-[12.5rem] h-11 px-1 justify-between items-center">
+                <p className="text-lg font-light leading-6 text-gray-900 font-kanit">
+                  {userInfo?.name}
+                </p>
+              </div>
+            )}
+            {isEditingNickname ? (
+              <button
+                onClick={handleNicknameSave}
+                className="flex items-center gap-[0.375rem] cursor-pointer"
+              >
+                <AiOutlineCheck className="flex items-center gap-[0.375rem] text-colorBlue" />
+                <p className="text-xl leading-normal tracking-tight text-colorBlue font-kanit">
+                  Done
+                </p>
+              </button>
+            ) : (
+              <button
+                onClick={() => handleNicknameEdit(userInfo?.name)}
+                className="flex items-center gap-[0.375rem] cursor-pointer"
+              >
+                <AiFillEdit
+                  className="flex items-center gap-[0.375rem] text-colorBlue cursor-pointer"
+                  onClick={() => handleNicknameEdit(userInfo?.name)}
+                />
+                <p className="text-xl leading-normal tracking-tight text-colorBlue font-kanit">
+                  Edit
+                </p>
+              </button>
             )}
           </div>
         </div>
@@ -161,8 +146,8 @@ const UserModal: React.FC<UserModalProps> = ({ closeModal }) => {
             Setting
           </p>
           <div className="flex flex-col items-start gap-4">
-            {token ? <LogoutBtn /> : null}
-            {token && <WithdrawalBtn token={token} userInfo={userInfo} />}
+            <LogoutBtn />
+            <WithdrawalBtn userInfo={userInfo} />
           </div>
         </div>
       </div>

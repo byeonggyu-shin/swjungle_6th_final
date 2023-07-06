@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
       connection = await db.getConnection();
       const interval = setInterval(() => {
         res.write(`data: ${JSON.stringify(eventData)}\n\n`);
-        logger.info(`/routes/notification 폴더, get 진행중이야 !`);
+        // logger.info(`/routes/notification 폴더, get 진행중이야 !`);
       }, 2000);
   
     // 클라이언트와의 연결이 종료될 때 interval 제거

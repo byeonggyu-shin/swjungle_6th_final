@@ -1,7 +1,6 @@
 import React from "react";
 import axios from "axios";
-
-const serverPath = "http://3.35.239.116:8800";
+import { GET } from "@/axios/GET";
 
 function UseronlyButton() {
   const sessionManage = async () => {
@@ -19,8 +18,7 @@ function UseronlyButton() {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       // Make the request to the protected endpoint
-      const response = await axios.get(`/api/users/me`);
-      console.log(response.data);
+      const response = await GET("users/me", false);
       alert(`${response.data.user.user_name} 님이 버튼에 접근했습니다.`);
     } catch (error) {
       console.log(error);

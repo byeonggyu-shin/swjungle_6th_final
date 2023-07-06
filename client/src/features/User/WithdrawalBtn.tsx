@@ -1,24 +1,17 @@
-import axios from "axios";
-import { signOut } from "next-auth/react";
+import { DELETE } from "@/axios/DELETE";
 
 type WithdrawalBtnProps = {
-  token: string | null;
   userInfo: any;
 };
 
-const WithdrawalBtn: React.FC<WithdrawalBtnProps> = ({ token, userInfo }) => {
+const WithdrawalBtn: React.FC<WithdrawalBtnProps> = ({ userInfo }) => {
   const handleWithdrawal = async () => {
     try {
-      const response = await axios.delete("/api/myinfo", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await DELETE("myinfo", true);
 
       if (response.data.success) {
         localStorage.removeItem("token");
         alert(`${userInfo?.name}님, 탈퇴되었습니다.`);
-        await signOut({ callbackUrl: "/" });
       }
     } catch (error) {
       console.error("Withdrawal failed:", error);
@@ -27,7 +20,7 @@ const WithdrawalBtn: React.FC<WithdrawalBtnProps> = ({ token, userInfo }) => {
 
   return (
     <button
-      className="bg-black text-white font-bold py-2 px-4 rounded mt-2"
+      className="bg-black text-white font-bold py-2 px-4 rounded mt-2 cursor-pointer"
       onClick={handleWithdrawal}
     >
       탈퇴

@@ -9,7 +9,7 @@ import { Card_Info_Api } from "@/axios/dashBoardApi";
 import { CardData } from "@/types/dashborad.types";
 
 function useCard() {
-  const [data, setData] = useState<CardData[]>();
+  const [data, setData] = useState<CardData>();
   const nodeName = useRecoilValue(NodeNameAtom);
   const router = useRouter();
 
@@ -20,8 +20,11 @@ function useCard() {
       const userid = Array.isArray(router.query.userid)
         ? router.query.userid[0]
         : router.query.userid;
+      
+      const page = router.query.page ? String(router.query.page) : "0";
+      const perPage = router.query.perPage ? String(router.query.perPage) : "9";;
 
-      const cardData = await Card_Info_Api(nodeName, userid);
+      const cardData = await Card_Info_Api(nodeName, userid, parseInt(page), parseInt(perPage));
       setData(cardData);
     };
     getCardData();

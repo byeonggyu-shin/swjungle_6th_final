@@ -5,7 +5,6 @@ import { db } from '../connect.js';
 
 const router = express.Router();
 
-
 const categories = [
   '패션',
   '건강',

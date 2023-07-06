@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-
-import getToken from "@/axios/getToken";
+import Image from "next/image";
 import { GET } from "@/axios/GET";
+
 import CardDetail from "@/features/Social/components/CardDetail";
 // Types
 import { Friends } from "@/types/social.types";
 // Assets
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import { useRecoilState } from "recoil";
+import { SocialImgModalAtom } from "@/recoil/atoms/SocialAtom";
 
 const Friends = () => {
   const [friends, setFriends] = useState([]);
@@ -16,15 +18,13 @@ const Friends = () => {
   const [startX, setStartX] = useState<number>(0);
   const [scrollLeft, setScrollLeft] = useState<number>(0);
   // 모달
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [userId, setUserId] = useState(1);
-  const [cardId, setCardId] = useState(1);
+  const [showModal, setShowModal] = useRecoilState(SocialImgModalAtom);
+  const [userId, setUserId] = useState(0);
+  const [cardId, setCardId] = useState(0);
 
   // 최근 업데이트 친구 조회
   const getFriends = async () => {
-    const token = getToken();
-    const data = await GET("social/updated", token);
+    const data = await GET("social/updated", true);
     if (data.status === 200) {
       setFriends(data.data);
     }
@@ -58,20 +58,14 @@ const Friends = () => {
     }
   };
 
-  const modalOutsideClicked = (e: any) => {
-    if (modalRef.current === e.target) {
-      setShowModal(false);
-    }
-  };
-
   return (
-    <div className="flex h-60 pb-10 flex-col items-start gap-10 self-stretch shadow-sm">
-      <h2 className="text-gray-900 text-[1.5rem] font-kanit font-semibold leading-1.5 tracking-tighter">
+    <div className="flex flex-col items-start self-stretch gap-10 pb-10 shadow-sm h-60">
+      <h2 className="text-gray-900 text-[1.5rem]  font-semibold leading-1.5 tracking-tighter">
         News
       </h2>
-      <div className="flex items-center gap-8 flex-1 self-stretch">
+      <div className="flex items-center gap-8 flex-1 self-stretch w-[53rem]">
         <div className="flex w-[1.75rem] h-[1.75rem] flex-col justify-center items-center">
-          <BsChevronLeft className="text-gray-800 text-base font-xeicon leading-normal" />
+          <BsChevronLeft className="text-base leading-normal text-gray-800 font-xeicon" />
         </div>
         <ul
           ref={listRef}
@@ -82,25 +76,27 @@ const Friends = () => {
           onMouseMove={handleMouseMove}
         >
           {friends &&
-            friends?.map((f: Friends) => {
+            friends?.map((f: Friends, index: number) => {
               return (
                 <li
-                  key={f.userId}
+                  key={index}
                   className="flex flex-col justify-center items-center w-[6.25rem] h-[8.25rem] flex-shrink-0 m-2 gap-3"
                 >
-                  <div className="w-[6.25rem] h-[6.25rem] transition transform rounded-full cursor-pointer hover:-rotate-6 bg-colorBlue flex justify-center items-center">
-                    <img
+                  <div className="relative w-[6.25rem] h-[6.25rem] transition transform rounded-full cursor-pointer hover:-rotate-6 bg-colorBlue flex justify-center items-center">
+                    <Image
                       src={f.profile_img}
-                      className="w-[5.25rem] h-[5.25rem] rounded-full"
-                      alt="profile"
+                      alt="Profile"
+                      width={84} // rem to pixel conversion (1rem = 16px)
+                      height={84} // rem to pixel conversion (1rem = 16px)
+                      className="rounded-full cursor-pointer"
                       onClick={() => {
-                        setShowModal(true);
                         setCardId(f.cardId);
                         setUserId(f.userId);
+                        setShowModal(true);
                       }}
                     />
                   </div>
-                  <p className="flex flex-col items-center justify-center overflow-hidden text-center w-6.0625rem h-auto text-gray-900 font-kanit text-lg leading-normal tracking-wider">
+                  <p className="flex flex-col items-center justify-center overflow-hidden text-center w-6.0625rem h-auto text-gray-900  text-lg leading-normal tracking-wider">
                     {f.userName}
                   </p>
                 </li>
@@ -108,16 +104,11 @@ const Friends = () => {
             })}
         </ul>
         <div className="flex w-[1.75rem] h-[1.75rem] flex-col justify-center items-center">
-          <BsChevronRight className="text-gray-800 text-base font-xeicon leading-normal" />
+          <BsChevronRight className="text-base leading-normal text-gray-800 font-xeicon" />
         </div>
       </div>
-      {showModal && (
-        <CardDetail
-          modalRef={modalRef}
-          modalOutsideClicked={modalOutsideClicked}
-          cardId={cardId}
-          userId={userId}
-        />
+      {showModal && cardId && userId && (
+        <CardDetail cardId={cardId} userId={userId} />
       )}
     </div>
   );

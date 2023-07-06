@@ -9,7 +9,7 @@ const SwitchToggle = ({ text }: { text: string }) => {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-gray-900 text-lg font-kanit font-light leading-6">
+      <span className="text-gray-900 text-lg  font-light leading-6">
         {text}
       </span>
       <label className="relative inline-flex items-center cursor-pointer">

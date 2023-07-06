@@ -1,10 +1,15 @@
 import axios, { AxiosResponse } from "axios";
+import getToken from "./getToken";
 
-export const GET = async (uri: string, headers?: any): Promise<any | null> => {
+export const GET = async (
+  uri: string,
+  headers: boolean
+): Promise<any | null> => {
   try {
     let res: AxiosResponse;
     if (headers) {
-      res = await axios.get(`/api/${uri}`, headers);
+      const token = getToken();
+      res = await axios.get(`/api/${uri}`, token);
     } else {
       res = await axios.get(`/api/${uri}`);
     }

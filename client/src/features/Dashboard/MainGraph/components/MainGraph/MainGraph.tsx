@@ -10,7 +10,7 @@ function MainGraph({ data }: any) {
   const editMode = useRecoilValue(EditModeAtom);
 
   return (
-    <div className={openCard ? "w-[42rem]" : "w-full"}>
+    <div className={openCard ? "w-[42rem]" : "w-full relative"}>
       <Graph data={data} editMode={editMode} />
     </div>
   );

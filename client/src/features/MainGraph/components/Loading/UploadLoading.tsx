@@ -1,3 +1,4 @@
+import Image from "next/image";
 // Recoil
 import { useRecoilState } from "recoil";
 import {
@@ -6,7 +7,7 @@ import {
   UploadedImgNumAtom,
 } from "@/recoil/atoms/MainGraphAtom";
 // Components
-import NavBar from "@/features/Dashboard/components/NavBar";
+import NavBar from "@/features/Header/NavBar";
 import { Wrapper } from "@/styles/wrapper";
 // Assets
 import { BiLoader } from "react-icons/bi";
@@ -14,29 +15,31 @@ import { BiLoader } from "react-icons/bi";
 
 const UploadLoading = () => {
   const [imageUrl, setImageUrl] = useRecoilState(UploadedImgAtom);
-  const [tags, setTags] = useRecoilState(ExportedTagsAtom);
   const [imgNum, setImgNum] = useRecoilState(UploadedImgNumAtom);
+  const [tags, setTags] = useRecoilState(ExportedTagsAtom);
 
   return (
-    <div className="bg-gray-100 h-screen">
+    <div className="h-screen bg-gray-100">
       <NavBar />
-      <Wrapper className="flex flex-col h-full justify-center">
+      <Wrapper className="flex flex-col justify-center h-full">
         <div className="flex flex-col items-center self-stretch bg-gray-100 ">
           <div
             className="flex flex-col items-center justify-center w-[52.5rem] pt-[0.75rem] pr-[1.5rem] pb-[1.25rem] pl-[1.5rem] rounded-xl border border-gray-100 bg-white"
             style={{ boxShadow: "0px 4px 8px 0px rgba(0, 0, 0, 0.16)" }}
           >
             <div className="flex h-[3.75rem] justify-start items-center self-stretch">
-              <p className="text-[1.5rem] font-kanit font-semibold leading-normal tracking-tight">
+              <p className="text-[1.5rem]  font-semibold leading-normal tracking-tight">
                 분석
               </p>
-              {/* <AiOutlineClose className="text-gray-400 text-1xl font-xeicon leading-normal" /> */}
+              {/* <AiOutlineClose className="leading-normal text-gray-400 text-1xl font-xeicon" /> */}
             </div>
             <div className="flex p-[3.75rem] justify-between items-center self-stretch border-b border-gray-900">
-              <div className="flex items-center justify-center gap-4 w-[14.5rem] h-[14.5rem] flex-shrink-0 rounded-md border border-gray-100 bg-gray-50">
-                <img
+              <div className="relative flex items-center justify-center gap-4 w-[14.5rem] h-[14.5rem] flex-shrink-0 rounded-md border border-gray-100 bg-gray-50">
+                <Image
                   src={imageUrl[0]}
-                  className="flex-1 self-stretch bg-lightgray bg-contain bg-no-repeat"
+                  alt="Image description"
+                  layout="fill"
+                  objectFit="contain"
                 />
               </div>
               <div className="flex items-start content-start gap-y-[0.5rem] gap-x-[0.25rem] h-[14.5rem] py-[0.5rem] px-1 justify-center flex-wrap">
@@ -54,8 +57,8 @@ const UploadLoading = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col items-center p-8 gap-2 self-stretch">
-          <p className="text-gray-800 text-base font-light leading-6 tracking-tighter">
+        <div className="flex flex-col items-center self-stretch gap-2 p-8">
+          <p className="text-base font-light leading-6 tracking-tighter text-gray-800">
             갤러리 속 숨겨진 인사이트를 발견하세요
           </p>
           <p className="flex items-center justify-center w-[8.03944rem] h-5">
