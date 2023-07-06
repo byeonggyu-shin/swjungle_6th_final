@@ -9,12 +9,12 @@ const SignupButton: React.FC = () => {
   };
 
   return (
-    <button
+    <p
+      className="text-gray-700 text-1.5xl font-ibm-plex-sans font-normal font-medium leading-normal cursor-pointer"
       onClick={handleClick}
-      className="font-bold py-2 rounded mr-4 border-black border w-full"
     >
-      회원가입
-    </button>
+      회원 가입
+    </p>
   );
 };
 
