@@ -42,10 +42,6 @@ export const processOCR = async(imgUrl) => {
       sumText += ' ' + element.inferText; 
     });
   
-    // console.log("-------------------");
-    // console.log(sumText);
-    // console.log("-------------------");
-  
     return sumText;
   
   } catch (err) {

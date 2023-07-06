@@ -1,6 +1,6 @@
 import { logger } from '../winston/logger.js';
 
-export const extractJson = (str) => {
+export const extractList = (str) => {
   if (str && str.length > 0) {
     const start = str.indexOf('[') + 1;
     const end = str.indexOf(']');
@@ -9,18 +9,13 @@ export const extractJson = (str) => {
       const array = JSON.parse(`[${extracted}]`);
       
       const limitedArray = array.slice(0, 2);
-      console.log('fr: 2개 제한 array: ', limitedArray);
-
-      return { tags: limitedArray };
+      return limitedArray;
     } else {
       logger.info('/services/jsonUtils 폴더, tags are not in format of [ ].');
-      return null;
+      return  [ '<Image>' ];
     }
   }
 };
-
-
-
 
 
 // export const extractJson = (inputString) => {
@@ -40,3 +35,7 @@ export const extractJson = (str) => {
 //   }
 //   return null;
 // };
+  
+// // module.exports = {
+// //   extractJson,
+// // };
