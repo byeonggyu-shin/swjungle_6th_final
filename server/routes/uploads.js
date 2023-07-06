@@ -11,13 +11,18 @@ import path from 'path';
 /* OCR ENDED */
 /* Tag LINE ADDED */
 import { generate } from '../services/generate.js';
-import { extractJson } from '../services/jsonUtils.js';
+import { extractList } from '../services/jsonUtils.js';
 import { combinedList }  from '../services/taglist.js';  
 /* Tag ENDED */
 // import { setTimeout } from 'timers/promises';   
 
 /* log */
 import { logger } from '../winston/logger.js';
+
+/* query */
+import { insertFileQuery } from '../db/uploadQueries.js';
+import { insertTagQuery } from '../db/uploadQueries.js';
+
 
 const s3 = new S3Client({
   region: 'ap-northeast-2',
@@ -52,88 +57,151 @@ const isImage = (ocrResult) => {
   return false;
 };
 
-/* Multer */
-// router.get('/', (req, res) => {
-//   res.sendFile(path.join(path.resolve(), './multipart.html'));
-// });
 
 const extractTagFromImage = async (imgUrl, req, res) => {
-  const sumText = await processOCR(imgUrl);
-  res.write(JSON.stringify({imgUrl: imgUrl, status: 'process OCR FINISEHD'}));
-  let tagJSON = '<Image>';  
-  if (!isImage(sumText)) {
-    const tag = await generate(req, res, sumText); 
-    tagJSON = extractJson(tag);
-    console.log(tagJSON);
-    /* 실시간 통신 */
-    res.write(JSON.stringify({imgUrl: imgUrl, status: 'extract JSON FINISHED', data: tagJSON}));
-  }
-  return {
+  const time = Date.now();
+  const arrival = Date.now() - time;
+  console.log('arrival: ', arrival);
+  
+  const processedData = {
     imgUrl,
-    sumText,
-    tagJSON,
+    content : '<Image>',
+    tags: [],
   };
+  
+  const sumText = await processOCR(imgUrl);
+  
+  console.log('isImage :', isImage);
+  if (!isImage(sumText)) {
+    const tag = await generate(req, res, sumText) 
+    console.log("extractTagFromImage :", tag);
+    
+    console.log('*** processedData.tags: ', processedData.tags);
+    if (!processedData || !processedData.tags) {
+      logger.error('Invalid JSON data. No "tags" property found in extractTagFromImage.');
+      return processedData;
+    }
+
+    if (processedData.tags == null || processedData.tags.some(tag => tag == null)) {
+      logger.error('/routes/uploads 폴더, post, Some tags are null in extractTagFromImage.');
+      return processedData;
+    }
+    processedData.tags.push(...extractList(tag));
+    processedData.content = sumText;
+    console.log('not image');
+    console.log(processedData);
+    return processedData;
+  } else {
+    processedData.tags.push(...['Other']);
+  }
+
+  console.log(processedData);
+  return processedData;
 };
 
+
+const executeQueries = async (connection, fileId, tag, tagIndex) => {
+  console.log('/routes/uploads 폴더 in executeQueries');
+  console.log('*** fileId, tag, tagIndex :', fileId, tag, tagIndex);
+
+  try {
+    /* tags가 'image'인 것은 tag:'기타', tag_index:0 으로 tag에 insert */
+    if (tag == '<Image>') {
+      console.log('***');
+      console.log("tag == '<Image>'");
+      await connection.query(insertTagQuery, [ fileId, tag, 0 ]);
+    } else {
+      await connection.query(insertTagQuery, [ fileId, tag, tagIndex]);
+    }
+  } catch (err) {
+    logger.error('/routes/uploads 폴더, executeQueries', err);
+  }
+  return connection;
+}
+
+
+async function processChunk(req, res, chunk, delay) {
+  const results = [];
+  for (const imgUrl of chunk) {
+    console.log('imgUrl :', imgUrl);
+    const processedData = await extractTagFromImage(imgUrl, req, res);
+      console.log('processedData');
+      console.log(processedData);
+      results.push(processedData);
+    console.log(`processedData completed for ${imgUrl}`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+  return results;
+}
 
 
 router.post('/', upload.array('photos'),
   async (req, res) => {
+  console.log('/routes/uploads 폴더 in post/upload');
 
-    const { user } = res.locals;    // authMiddleware 리턴값
-    const useId = user.user_id;
+  const { user } = res.locals;    // authMiddleware 리턴값
+  const userId = user.user_id;
+  const imgUrlList = req.body;
 
-    const imgUrlList = req.body;
+  let connection = null;
 
-    let connection = null;
-    try {
-      connection = await db.getConnection();  
-      const q1 = 'INSERT INTO File (user_id, img_url, content) VALUES (?, ?, ?)';   // SQL - File 
-      const q2 = 'INSERT INTO Tag (file_id, tag, tag_index) VALUES (?, ?, ?)';      // SQL - Tag  
-      
-      /* 모든 이미지를 S3로 저장, sumText.length != 0 인 것만 OCR 및 태그 추출 후 저장 */
-      const promises = [];
-      for (const imgUrl of imgUrlList) {
-        promises.push(extractTagFromImage(imgUrl, req, res));
-      }
-      const tagList = await Promise.all(promises);  // promise 배열을 한번에 풀어줌. 푸는 순서를 보장하지 않지만 n개를 동시에 풀어줌.
-      
-      for (const { tagJSON, sumText, imgUrl } of tagList) {
-        if (tagJSON === '<Image>') continue;
-        /* Tag 가공 -> index, KR */
-        const tag1 = tagJSON.tags[0];   // tag english string
-        const tag2 = tagJSON.tags[1];
+  try {
+    connection = await db.getConnection();  
+
+    /* 모든 이미지를 S3로 저장, sumText.length != 0 인 것만 OCR 및 태그 추출 후 저장 */
+    const limitCall = process.env.OCR_CALL_LIMIT;
+
+    /* NaverOCR api call limit이 넘지 않게 5번 씩 나눠 보내기 */
+    const imgUrlListLength = imgUrlList.length;
+    const chunkSize = Math.ceil(imgUrlListLength / limitCall);
+
+    const promises = [];
+    for (let i = 0; i < imgUrlListLength; i += chunkSize) {
+      const chunk = imgUrlList.slice(i, i + chunkSize);
+      promises.push(processChunk(req, res, chunk, 1000));
+    }
+
+    const resultList = await Promise.all(promises);  // promise 배열을 한번에 풀어줌. 푸는 순서를 보장하지 않지만 n개를 동시에 풀어줌.
+    
+    console.log('resultList');
+    console.log(resultList);
+    connection.beginTransaction();
+    for (const results of resultList) {
+      for (const result of results) {
+        const { imgUrl, content, tags } = result;
+        console.log(result);
+        console.log(result[0]);
+        // 1. 이미지 파일 저장
+        console.log('imgUrl, content, tags :', result.imgUrl, result.content, result.tags);
+        const [ fileResult ] = await connection.query(insertFileQuery, [ userId, imgUrl, content ]);
         
-        const tagRow1 = combinedList.find(item => item.englishKeyword === tag1);
-        const tagRow2 = combinedList.find(item => item.englishKeyword === tag2);
-
-        if (tagRow1 && tagRow2) {
-        /* SQL - File */
-          const [ result1 ] = await connection.query(q1, [ useId, imgUrl, sumText ]);
-          // console.log(result1);
-          /* SQL - Tag */
-          const [ result2 ] = await connection.query(q2, [ result1.insertId, tagRow1.koreanKeyword, tagRow1.index ]);   // file's insertId, tag name(KR), tag[0] enum
-          const [ result3 ] = await connection.query(q2, [ result1.insertId, tagRow2.koreanKeyword, tagRow2.index ]);   // file's insertId, tag name(KR), tag[1] enum
-        } else {
-          if (!tagRow1) {
-            logger.info(`/routes/uploads 폴더, post, No matching element found for ${tag1}.`);
-          }
-          if (!tagRow2) {
-            logger.info(`/routes/uploads 폴더, post, No matching element found for ${tag2}.`);
+        console.log('tags :', tags);
+        // 2. 이미지 파일로 추출된 태그 저장
+        for (const tag of tags) {
+          /* Tag 가공 -> index, KR */
+          const tagRow = combinedList.find(item => item.englishKeyword === tag);
+          if (tagRow) {
+            connection = await executeQueries(connection, fileResult.insertId, tagRow.koreanKeyword, tagRow.index);
+          } else {
+            logger.error(`/routes/uploads 폴더, post, No matching element found for ${tag}.`);
           }
         }
       }
-      // console.log(tagList);
+    }
+      connection.commit();
+      console.log('commit');
       connection.release();
-
       res.write('SUCCESS');
       return res.end();
 
     } catch (err) {
-      connection?.release();
       logger.error('/routes/uploads 폴더, post, err : ', err);
+      connection.rollback();
+      console.log('rollback');
+      connection?.release();
       res.status(400).send('ERROR');
     }
+  
   },
 );
 

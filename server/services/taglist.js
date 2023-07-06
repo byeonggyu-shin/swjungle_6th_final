@@ -72,6 +72,7 @@ export const screenshotSubjects_en = [
   'Investment Information',
   'Tax',
   'Pension',
+  'Other',
 ];
   
 export const screenshotSubjects_kr = [
@@ -148,6 +149,7 @@ export const screenshotSubjects_kr = [
   '투자 정보',
   '세금',
   '연금',
+  '기타',
 ];
 
 
@@ -158,7 +160,7 @@ export const combinedList = screenshotSubjects_en.map((subject, index) => {
     koreanKeyword: screenshotSubjects_kr[index],
   };
 });
-// console.log(combinedList);
+console.log(combinedList);
 
 
 export const mappedObject = screenshotSubjects_en.reduce((obj, subject, index) => {

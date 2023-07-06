@@ -11,7 +11,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://insightlinkapi.jisuheo.shop/api/:path*",
+        destination: "http://localhost:8800/api/:path*",
       },
     ];
   },
