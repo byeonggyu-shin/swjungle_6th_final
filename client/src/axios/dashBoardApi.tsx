@@ -53,10 +53,7 @@ export const Card_Info_Api = async (
   perPage?: number | undefined
 ): Promise<CardData> => {
   let url = `/api/cards/tag${tagname ? `?tagname=${tagname}` : ""}${
-    userid ? `&userId=${userid}` : ""
-  }${page ? `&page=${page}` : "&page=1"}${
-    perPage ? `&perPage=${perPage}` : "&perPage=9"
-  }
+    userid ? `&userId=${userid}` : ""}${page ? `&page=${page}` : "&page=1"}${perPage ? `&perPage=${perPage}` : "&perPage=9"}
   `;
   try {
     const response = await axiosInstance.get(url);
