@@ -48,7 +48,7 @@ const Feeds = () => {
       <h2 className="text-gray-900 text-[1.5rem]  font-semibold leading-1.5 tracking-tighter">
         Feed
       </h2>
-      <div className="grid grid-cols-5 grid-flow-row gap-y-3 self-stretch flex-wrap min-h-[53rem] w-full">
+      <div className="grid grid-cols-5 grid-flow-row gap-y-3 self-stretch flex-wrap w-full">
         {cards &&
           cards.map((c: FeedCardData, index: number) => {
             return (

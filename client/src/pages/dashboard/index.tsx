@@ -19,11 +19,11 @@ export default function Dashboard() {
   const graphData = useGraph();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     const userid = router.query.userid;
-    
-    if (!token && ! userid) {
-      router.push('/');
+
+    if (!token && !userid) {
+      router.push("/");
     }
   }, []);
 

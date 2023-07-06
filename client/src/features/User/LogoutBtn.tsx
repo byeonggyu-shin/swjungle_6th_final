@@ -6,6 +6,8 @@ function LogoutBtn() {
 
   const logouthandler = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("recoil-persist");
+    localStorage.removeItem("userId");
 
     // Redirect to the main page(index.js)
     router.push("/");

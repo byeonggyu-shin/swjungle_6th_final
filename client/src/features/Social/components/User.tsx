@@ -20,7 +20,7 @@ const randomColors = [
   "#73C0DE",
   "#5470C6",
   "#9A60B4",
-  "#FFC0CB",
+  "#FF88E0",
 ];
 
 const User = () => {

@@ -10,7 +10,7 @@
     @apply text-xl font-semibold;
   }
   .follow-btn {
-    @apply px-3 border bg-gray-50 border-gray-200 rounded-md text-center;
+    @apply px-3 text-center flex justify-center items-center text-gray-900;
   }
   .svg-button-nomal {
     @apply flex items-center justify-center bg-white rounded cursor-pointer hover:bg-gray-50 w-7 h-7;

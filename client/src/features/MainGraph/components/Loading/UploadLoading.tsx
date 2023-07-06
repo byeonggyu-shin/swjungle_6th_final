@@ -7,7 +7,7 @@ import {
   UploadedImgNumAtom,
 } from "@/recoil/atoms/MainGraphAtom";
 // Components
-import NavBar from "@/features/Dashboard/components/NavBar";
+import NavBar from "@/features/Header/NavBar";
 import { Wrapper } from "@/styles/wrapper";
 // Assets
 import { BiLoader } from "react-icons/bi";

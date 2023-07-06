@@ -5,7 +5,7 @@ import { User_Info_Api } from "@/axios/dashBoardApi";
 import { useRecoilState } from "recoil";
 import { FollowCntAtom } from "@/recoil/atoms/LoginStateAtom";
 // Component
-import NavBar from "@/features/Dashboard/components/NavBar";
+import NavBar from "@/features/Header/NavBar";
 import Friends from "@/features/Social/components/Friends";
 import Feeds from "@/features/Social/components/Feeds";
 import Users from "@/features/Social/components/Users";

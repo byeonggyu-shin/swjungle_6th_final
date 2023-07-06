@@ -14,7 +14,7 @@ const randomColors = [
   "#73C0DE",
   "#5470C6",
   "#9A60B4",
-  "#FFC0CB",
+  "#FF88E0",
 ];
 
 type CardModalProps = {
@@ -51,22 +51,22 @@ const CardModal: React.FC<CardModalProps> = ({ card, closeModal }) => {
           {/* <div
             className={`overflow-auto ${styles["mostly-customized-scrollbar"]}`}
           > */}
-            <div className="relative w-[28.25rem] flex justify-center items-center bg-lightgray">
-              <Image
-                src={card.imageUrl}
-                alt="Card image"
-                layout="responsive"
-                objectFit="cover"
-                width={500}
-                height={300}
-              />
-            </div>
+          <div className="relative w-[28.25rem] flex justify-center items-center bg-lightgray">
+            <Image
+              src={card.imageUrl}
+              alt="Card image"
+              layout="responsive"
+              objectFit="cover"
+              width={500}
+              height={300}
+            />
+          </div>
 
-            <div className="flex flex-col self-stretch">
-              <span className="text-gray-900 text-[1.25rem] font-light leading-150">
-                {card.content}
-              </span>
-            </div>
+          <div className="flex flex-col self-stretch">
+            <span className="text-gray-900 text-[1.25rem] font-light leading-150">
+              {card.content}
+            </span>
+          </div>
           {/* </div> */}
         </div>
       </div>

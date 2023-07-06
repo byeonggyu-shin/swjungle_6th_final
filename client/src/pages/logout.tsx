@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
+// recoil
+import { useSetRecoilState } from "recoil";
+import { LoginStateAtom, IsLoginAtom } from "@/recoil/atoms/LoginStateAtom";
 // Component
 import { Wrapper } from "@/styles/wrapper";
 
@@ -7,11 +11,14 @@ export default function Home() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
 
+  const setLoginId = useSetRecoilState(LoginStateAtom);
+  const setIsLogin = useSetRecoilState(IsLoginAtom);
+
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
 
     if (!storedToken) {
-      router.push('/');
+      router.push("/");
     }
     setToken(storedToken);
   }, []);
@@ -19,7 +26,8 @@ export default function Home() {
   const handleLogout = () => {
     alert("Logout successful!");
     localStorage.removeItem("token");
-    router.push("/");
+    setLoginId(0);
+    setIsLogin(false);
   };
 
   return (
@@ -28,7 +36,7 @@ export default function Home() {
         <div className="container flex flex-col items-end max-w-md mx-auto">
           {/* Updated class */}
         </div>
-        <div className="flex justify-end mt-4">
+        <Link className="flex justify-end mt-4" href={"/"}>
           {token ? (
             <button
               onClick={handleLogout}
@@ -37,7 +45,7 @@ export default function Home() {
               로그아웃
             </button>
           ) : null}
-        </div>
+        </Link>
       </div>
     </Wrapper>
   );

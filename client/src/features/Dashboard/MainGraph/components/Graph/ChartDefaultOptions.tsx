@@ -1,16 +1,47 @@
 import { Main_graph_Api_DTO } from "@/types/dashborad.types";
 import setCategories from "./setCategories";
 
+const randomColors = [
+  "#EE6565",
+  "#FB8351",
+  "#FFA500",
+  "#FAC858",
+  "#91CB75",
+  "#3AA272",
+  "#73C0DE",
+  "#5470C6",
+  "#9A60B4",
+  "#FFC0CB",
+  "#FFD700",
+  "#195E31",
+  "#254D9B",
+  "#CDA0D9 ",
+  "#FF88E0",
+  "#181818",
+];
+
 const ChartDefaultOptions = (graph: Main_graph_Api_DTO) => {
+  const nodeColorMapping = new Map();
+  const nodes = graph?.nodes.map((node) => {
+    const color = randomColors[node.category % randomColors.length];
+    nodeColorMapping.set(node.id, color);
+    return {
+      ...node,
+      itemStyle: {
+        color,
+      },
+    };
+  });
+
+  const links = graph?.links.map((link) => ({
+    ...link,
+    lineStyle: {
+      color: nodeColorMapping.get(link.source), // Use color of source node
+    },
+  }));
+
   return {
-    tooltip: {},
-    // legend: [
-    //   {
-    //     data: setCategories(graph?.cnt).map(function (a) {
-    //       return a.name;
-    //     }),
-    //   },
-    // ],
+    tooltip: false,
     animation: true,
     animationDuration: 1500,
     animationEasingUpdate: "quinticInOut",
@@ -18,15 +49,16 @@ const ChartDefaultOptions = (graph: Main_graph_Api_DTO) => {
       {
         type: "graph",
         layout: "force",
-        data: graph?.nodes,
-        links: graph?.links,
+        data: nodes,
+        links: links,
         categories: setCategories(graph?.cnt),
         roam: true,
         draggable: true,
         label: {
-          show: true, // 노드 이름 항상 표시
-          position: "top", // 레이블을 위로 정렬
+          show: true,
+          position: "top",
           formatter: "{b}",
+          color: "auto",
         },
         labelLayout: {
           hideOverlap: true,
@@ -37,7 +69,6 @@ const ChartDefaultOptions = (graph: Main_graph_Api_DTO) => {
         },
         lineStyle: {
           width: 2, // edge의 두께
-          color: "source",
           curveness: 0, // edge의 곡률, 0은 직선
         },
         emphasis: {
@@ -48,8 +79,8 @@ const ChartDefaultOptions = (graph: Main_graph_Api_DTO) => {
         },
         force: {
           repulsion: 350, // 노드 간 반발력 조정
-          gravity: 0.5, // 중력
-          edgeLength: [20, 90], // 노드 간 거리 [minlength, maxlength]
+          gravity: 0.2, // 중력
+          edgeLength: [60, 130], // 노드 간 거리 [minlength, maxlength]
         },
       },
     ],

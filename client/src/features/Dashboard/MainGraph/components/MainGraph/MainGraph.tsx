@@ -11,7 +11,6 @@ function MainGraph({ data }: any) {
 
   return (
     <div className={openCard ? "w-[42rem]" : "w-full relative"}>
-      <button>그래프 수정</button>
       <Graph data={data} editMode={editMode} />
     </div>
   );

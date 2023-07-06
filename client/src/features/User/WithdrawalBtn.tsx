@@ -1,5 +1,4 @@
 import { DELETE } from "@/axios/DELETE";
-import { signOut } from "next-auth/react";
 
 type WithdrawalBtnProps = {
   userInfo: any;
@@ -13,7 +12,6 @@ const WithdrawalBtn: React.FC<WithdrawalBtnProps> = ({ userInfo }) => {
       if (response.data.success) {
         localStorage.removeItem("token");
         alert(`${userInfo?.name}님, 탈퇴되었습니다.`);
-        await signOut({ callbackUrl: "/" });
       }
     } catch (error) {
       console.error("Withdrawal failed:", error);

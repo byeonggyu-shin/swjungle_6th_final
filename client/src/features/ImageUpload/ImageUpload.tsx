@@ -63,6 +63,7 @@ const ImageUpload = () => {
       const uploadedImageUrls = await UploadImagesToS3(imgList);
       setImageUrl(uploadedImageUrls);
 
+      setUploading(true);
       const POSTImgLink = async () => {
         const data: any = await POST("upload", uploadedImageUrls, true);
 
@@ -158,7 +159,6 @@ const ImageUpload = () => {
         <div className="flex items-start gap-2">
           <div
             onClick={() => {
-              setUploading(true);
               setShowImgModal(false);
               uploadImages();
             }}
