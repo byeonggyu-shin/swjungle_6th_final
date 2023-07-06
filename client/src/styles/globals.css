@@ -7,3 +7,16 @@
 * {
   font-family: "Kanit";
 }
+
+
+/* Styles the scrollbar track */
+::-webkit-scrollbar {
+  width: 0.5rem;
+  background-color: #FFF;
+}
+
+/* Styles the scrollbar thumb (the draggable portion) */
+::-webkit-scrollbar-thumb {
+  background-color: #DADADA;
+  height: 19.9375rem;
+}

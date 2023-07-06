@@ -25,17 +25,24 @@ export interface Main_graph_Api_DTO {
   cnt: number;
 }
 
+export interface CardDataData {
+  cardId: number,
+  cardTag: string[],
+  cardContent: string,
+  cardImg: string,
+  userId: number,
+  userName: string,
+  img: string,
+  tag: string,
+  content: string,
+  isFriend: boolean
+}
+
 export interface CardData {
-  cardId: number;
-  cardTag: string[];
-  cardContent: string;
-  cardImg: string;
-  userId: number;
-  userName: string;
-  img: string;
-  tag: string;
-  content: string;
-  isFriend: boolean;
+  data : [CardDataData];
+  totalResults : number;
+  totalPages : number;
+  hasNextPage : boolean;
 }
 
 export interface CardDataDetail {

@@ -48,14 +48,16 @@ export const User_Info_Api = async (userid?: string): Promise<UserInfo_DTO> => {
 
 export const Card_Info_Api = async (
   tagname?: string | null,
-  userid?: string | undefined
-): Promise<CardData[]> => {
+  userid?: string | undefined,
+  page?: number | undefined,
+  perPage?: number | undefined
+): Promise<CardData> => {
   let url = `/api/cards/tag${tagname ? `?tagname=${tagname}` : ""}${
-    userid ? `&userId=${userid}` : ""
-  }`;
-
+    userid ? `&userId=${userid}` : ""}${page ? `&page=${page}` : "&page=1"}${perPage ? `&perPage=${perPage}` : "&perPage=9"}
+  `;
   try {
     const response = await axiosInstance.get(url);
+
     return response.data;
   } catch (err) {
     console.error(err);

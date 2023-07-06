@@ -1,14 +1,32 @@
 /* 태그명에 해당하는 file_id, content 
-                -> cardId, cardContent */
+-> cardId, cardContent */
 export const tagCardsQuery = 
-  `SELECT File.file_id, File.content, File.img_url
-    FROM File
-    JOIN Tag ON File.file_id = Tag.file_id
-    WHERE File.user_id = ? AND Tag.tag = ?`;
+`SELECT File.file_id, File.content, File.img_url
+  FROM File
+  JOIN Tag ON File.file_id = Tag.file_id
+  WHERE File.user_id = ? AND Tag.tag = ?`;
 
 /* 파일id에 해당하는 태그 */
 export const cardTagsQuery = 
 `SELECT Tag.tag
-  FROM Tag
-  JOIN File ON Tag.file_id = File.file_id
-  WHERE File.user_id = ? AND File.file_id = ?`;
+FROM Tag
+JOIN File ON Tag.file_id = File.file_id
+WHERE File.user_id = ? AND File.file_id = ?`;
+
+export const tagCardsToPageQuery = 
+`SELECT File.file_id, File.content, File.img_url
+  FROM File
+    JOIN Tag ON File.file_id = Tag.file_id
+  WHERE File.user_id = ? 
+  AND Tag.tag = ?
+  LIMIT ?, ?`;
+
+export const countTagCards = 
+`SELECT count(*) AS total
+FROM (
+  SELECT File.file_id, File.content, File.img_url
+    FROM File
+      JOIN Tag ON File.file_id = Tag.file_id
+    WHERE File.user_id = ? 
+    AND Tag.tag = ?
+) AS SubQuery`;
