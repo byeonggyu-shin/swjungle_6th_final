@@ -1,5 +1,5 @@
 import React from "react";
-
+import Image from "next/image";
 // Recoil
 import { useRecoilState, useSetRecoilState } from "recoil";
 import {
@@ -7,12 +7,12 @@ import {
   ClickedCardDetailAtom,
 } from "@/recoil/atoms/MainGraphAtom";
 // Types
-import { CardData } from "@/types/dashborad.types";
+import { FeedCardData } from "@/types/dashborad.types";
 // Assets
 import { BiFullscreen } from "react-icons/bi";
 
 interface CardProps {
-  data: CardData;
+  data: FeedCardData;
 }
 
 const Card: React.FC<CardProps> = ({ data }) => {
@@ -26,10 +26,10 @@ const Card: React.FC<CardProps> = ({ data }) => {
 
   return (
     <div className="w-[10rem] bg-gray-100 h-[10rem] border-2 rounded border-gray-300 relative hover:border-blue-500 flex justify-center items-center">
-      <img src={data?.cardImg} className="object-cover max-w-full max-h-full" />
+      <Image src={data?.cardImg} alt="" objectFit="cover" layout="fill" />
       <button
+        className="absolute cursor-pointer svg-button-nomal right-3 bottom-3"
         onClick={handleCardClick}
-        className="absolute svg-button-nomal right-3 bottom-3 cursor-pointer"
       >
         <BiFullscreen className="self-center z-1" size="1rem" />
       </button>

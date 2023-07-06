@@ -2,6 +2,8 @@ import jwt from'jsonwebtoken';
 import '../dotenv.js';
 import { db } from '../connect.js';
 
+import { logger } from '../winston/logger.js';
+
 export const authMiddleware = async (req, res, next) => {
   console.log('req.headers.authorization: ', req.headers.authorization);  //@
   const { authorization } = req.headers;
@@ -9,7 +11,7 @@ export const authMiddleware = async (req, res, next) => {
 
   if (!authToken || authType !== 'Bearer') {
     res.status(401).send({
-      errorMessage: 'This function is available after logging in.',
+      errorMessage: 'This function is available after log in.',
     });
     return;
   }
@@ -33,11 +35,13 @@ export const authMiddleware = async (req, res, next) => {
 
     const user = result[0];
     res.locals.user = user; // 서버측 구성
-    // console.log(user);
+    logger.info(`auth middleware userId : ${userId} 통과`);
     next();
   } catch (err) {
     res.status(401).send({
       errorMessage: '로그인 후 이용 가능한 기능입니다.',
     });
+
+    logger.error("auth middleware 에러 :", err);
   }
 };
