@@ -20,8 +20,8 @@ export const followAdd = async (req, res) => {
   try {
     connection = await db.getConnection();
     const [result] = await connection.query(followAddQuery, [userId, following_id]);
-    const alarm_message = "Following";
-    await connection.query(InsertAlarmQuery(userId,following_id,alarm_message));
+    // const alarm_message = "Following";
+    // await connection.query(InsertAlarmQuery(userId,following_id,alarm_message));
     connection.release();
     logger.info('/routes/social/follow 폴더 followAdd함수, post 성공 !');
     res.status(200).send(`User ${userId} has started following User ${following_id}.`);

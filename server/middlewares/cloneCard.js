@@ -22,8 +22,8 @@ export const cloneCard = async (req, res) => {
     logger.info('/routes/social/cloneCard 폴더 cloneCard함수, post 성공 !')
     let connection = null;
     connection = await db.getConnection();
-    const alarm_message = "CardDuplicate";
-    await connection.query(InsertAlarmQuery(userId,following_id,alarm_message));
+    // const alarm_message = "CardDuplicate";
+    // await connection.query(InsertAlarmQuery(userId,following_id,alarm_message));
     connection.release();
     res.status(200).send('SUCCESS')
   } catch (err) {
