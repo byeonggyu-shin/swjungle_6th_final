@@ -111,7 +111,7 @@ export const recommendSimilarQuery = (userId) => {
         WHERE File.user_id = ${userId}
     ) 
   ) AS subquery
-  WHERE rn <= 2
+  WHERE rn <= 4
   LIMIT 20;`;
 };
 
@@ -145,7 +145,7 @@ export const recommendDiscoverQuery = (userId, recommendList) => {
         WHERE File.user_id = ${userId}
     )
   ) AS subquery
-WHERE rn <= 2
+WHERE rn <= 4
 LIMIT 15`;
 };
     
